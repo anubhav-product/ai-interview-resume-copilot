@@ -18,13 +18,23 @@ except ImportError:
 
 # Environment Setup
 load_dotenv()
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+
+# Try to get API key from Streamlit Secrets first (for deployed apps)
+# Fall back to .env file (for local development)
+try:
+    OPENAI_API_KEY = st.secrets["OPENAI_API_KEY"]
+except (KeyError, FileNotFoundError):
+    OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 
 if not OPENAI_API_KEY:
-    st.error("❌ OpenAI API key not found. Create .env file in app/ folder with OPENAI_API_KEY=your_key")
+    st.error("❌ OpenAI API key not found.\n\n**Local:** Create .env in app/ folder\n**Streamlit Cloud:** Add to Secrets")
     st.stop()
 
-client = OpenAI(api_key=OPENAI_API_KEY)
+try:
+    client = OpenAI(api_key=OPENAI_API_KEY)
+except Exception as e:
+    st.error(f"❌ OpenAI initialization error: {str(e)}")
+    st.stop()
 
 # Rate Limiting Configuration
 MAX_REQUESTS_PER_HOUR = 5  # Free tier limit
