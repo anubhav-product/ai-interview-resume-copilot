@@ -30,14 +30,16 @@ if not OPENAI_API_KEY:
     st.error("❌ OpenAI API key not found.\n\n**Local:** Create .env in app/ folder\n**Streamlit Cloud:** Add to Secrets")
     st.stop()
 
-try:
-    client = OpenAI(api_key=OPENAI_API_KEY, timeout=60.0)
-except TypeError:
-    # Fallback for version compatibility issues
-    client = OpenAI(api_key=OPENAI_API_KEY)
-except Exception as e:
-    st.error(f"❌ OpenAI initialization error: {str(e)}")
-    st.stop()
+# Use st.cache_resource to initialize client only once
+@st.cache_resource
+def get_openai_client():
+    try:
+        return OpenAI(api_key=OPENAI_API_KEY)
+    except Exception as e:
+        st.error(f"❌ OpenAI initialization error: {str(e)}")
+        st.stop()
+
+client = get_openai_client()
 
 # Rate Limiting Configuration
 MAX_REQUESTS_PER_HOUR = 5  # Free tier limit
@@ -149,7 +151,7 @@ def generate_pdf_report(analysis, candidate_name="Candidate", model_used="gpt-4"
         return pdf_buffer
     except: return None
 
-def analyze_resume(resume_text, job_description, model="gpt-4"):
+def analyze_resume(resume_text, job_description, model="gpt-3.5-turbo"):
     prompt = f"""
 You are an AI career assistant. Analyze the resume against job description in markdown format:
 ### Job Readiness Indicator
@@ -169,26 +171,29 @@ Resume: {resume_text[:2000]}
 Job Description: {job_description[:1000]}
 """
     try:
-        response = client.chat.completions.create(
-            model=model, 
+        response = client.ChatCompletion.create(
+            model=model,
             messages=[
-                {"role": "system", "content": "You are helpful."}, 
+                {"role": "system", "content": "You are helpful."},
                 {"role": "user", "content": prompt}
-            ], 
+            ],
             max_tokens=MAX_TOKENS_PER_REQUEST,
             temperature=0.7
         )
         log_api_usage()
-        return response.choices[0].message.content
+        return response['choices'][0]['message']['content']
     except Exception as e:
-        if "429" in str(e): st.error("❌ API Quota Exceeded. Check https://platform.openai.com/account/billing")
-        elif "model" in str(e).lower(): st.error("❌ Model not available. Try gpt-3.5-turbo")
-        else: st.error(f"❌ Error: {str(e)}")
+        if "429" in str(e):
+            st.error("❌ API Quota Exceeded. Check https://platform.openai.com/account/billing")
+        elif "model" in str(e).lower():
+            st.error("❌ Model not available. Try gpt-3.5-turbo")
+        else:
+            st.error(f"❌ Error: {str(e)}")
         return None
 
 # Sidebar
 st.sidebar.markdown("---\n### ⚙️ Settings")
-model = st.sidebar.selectbox("🤖 Select Model:", ["gpt-4", "gpt-4-turbo", "gpt-3.5-turbo"])
+model = st.sidebar.selectbox("🤖 Select Model:", ["gpt-3.5-turbo", "gpt-4", "gpt-4-turbo"], index=0)
 st.sidebar.markdown("---\n### 📖 How to Use:\n1. Upload resume (PDF)\n2. Paste job description\n3. Click Analyze\n4. Download results")
 st.sidebar.caption("Made with ❤️ for better hiring")
 
