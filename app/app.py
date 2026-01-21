@@ -163,7 +163,7 @@ Resume: {resume_text[:2000]}
 Job Description: {job_description[:1000]}
 """
     try:
-        response = client.ChatCompletion.create(
+        response = openai.ChatCompletion.create(
             model=model,
             messages=[
                 {"role": "system", "content": "You are helpful."},
@@ -171,7 +171,7 @@ Job Description: {job_description[:1000]}
             ],
             max_tokens=MAX_TOKENS_PER_REQUEST,
             temperature=0.7
-        )openai
+        )
         log_api_usage()
         return response['choices'][0]['message']['content']
     except Exception as e:
