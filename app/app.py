@@ -59,7 +59,7 @@ Job Description:
 """
 
     response = openai.ChatCompletion.create(
-        model="gpt-4",
+        model="gpt-5.2",
         messages=[{"role": "user", "content": prompt}],
         temperature=0.2
     )
