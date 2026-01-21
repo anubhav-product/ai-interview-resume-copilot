@@ -1,4 +1,5 @@
-streamlit
-openai
-pypdf
-python-dotenv
+streamlit==1.28.1
+openai==1.3.6
+pypdf==4.0.0
+python-dotenv==1.0.0
+reportlab==4.0.7

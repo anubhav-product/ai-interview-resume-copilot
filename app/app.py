@@ -3,8 +3,9 @@ from pypdf import PdfReader
 from openai import OpenAI
 import os
 from dotenv import load_dotenv
-from datetime import datetime
+from datetime import datetime, timedelta
 from io import BytesIO
+import json
 try:
     from reportlab.lib.pagesizes import letter
     from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
@@ -24,6 +25,46 @@ if not OPENAI_API_KEY:
     st.stop()
 
 client = OpenAI(api_key=OPENAI_API_KEY)
+
+# Rate Limiting Configuration
+MAX_REQUESTS_PER_HOUR = 5  # Free tier limit
+MAX_REQUESTS_PER_DAY = 20
+MAX_TOKENS_PER_REQUEST = 1000  # Cost control
+
+def get_user_id():
+    """Get unique user identifier based on session"""
+    return str(st.session_state.get("session_id", st.get_option("server.startupScript")))
+
+def check_rate_limit():
+    """Check if user has exceeded rate limits"""
+    now = datetime.now()
+    
+    if "usage_log" not in st.session_state:
+        st.session_state.usage_log = []
+    
+    # Clean old entries
+    st.session_state.usage_log = [
+        entry for entry in st.session_state.usage_log 
+        if entry["timestamp"] > now - timedelta(days=1)
+    ]
+    
+    # Check hourly limit
+    hourly_count = len([e for e in st.session_state.usage_log if e["timestamp"] > now - timedelta(hours=1)])
+    if hourly_count >= MAX_REQUESTS_PER_HOUR:
+        return False, f"⏰ Hourly limit ({MAX_REQUESTS_PER_HOUR}/hour) reached. Try again after 1 hour."
+    
+    # Check daily limit
+    daily_count = len([e for e in st.session_state.usage_log if e["timestamp"] > now - timedelta(days=1)])
+    if daily_count >= MAX_REQUESTS_PER_DAY:
+        return False, f"📊 Daily limit ({MAX_REQUESTS_PER_DAY}/day) reached. Try again tomorrow."
+    
+    return True, f"✅ Usage: {hourly_count + 1}/{MAX_REQUESTS_PER_HOUR} this hour, {daily_count + 1}/{MAX_REQUESTS_PER_DAY} today"
+
+def log_api_usage():
+    """Log API usage for rate limiting"""
+    if "usage_log" not in st.session_state:
+        st.session_state.usage_log = []
+    st.session_state.usage_log.append({"timestamp": datetime.now()})
 
 # Page Config
 st.set_page_config(page_title="AI Resume Screening Copilot", page_icon="📄", layout="wide", initial_sidebar_state="expanded")
@@ -111,11 +152,20 @@ You are an AI career assistant. Analyze the resume against job description in ma
 ### Interview Focus Areas
 - Topics to probe
 
-Resume: {resume_text}
-Job Description: {job_description}
+Resume: {resume_text[:2000]}
+Job Description: {job_description[:1000]}
 """
     try:
-        response = client.chat.completions.create(model=model, messages=[{"role": "system", "content": "You are helpful."}, {"role": "user", "content": prompt}], max_tokens=1500, temperature=0.7)
+        response = client.chat.completions.create(
+            model=model, 
+            messages=[
+                {"role": "system", "content": "You are helpful."}, 
+                {"role": "user", "content": prompt}
+            ], 
+            max_tokens=MAX_TOKENS_PER_REQUEST,
+            temperature=0.7
+        )
+        log_api_usage()
         return response.choices[0].message.content
     except Exception as e:
         if "429" in str(e): st.error("❌ API Quota Exceeded. Check https://platform.openai.com/account/billing")
@@ -146,9 +196,16 @@ with col2:
     if job_description: st.caption(f"📝 {len(job_description.split())} words")
 
 st.markdown("---")
+
+# Display usage info
+col_usage_1, col_usage_2, col_usage_3 = st.columns(3)
+with col_usage_1:
+    can_proceed, usage_msg = check_rate_limit()
+    st.info(usage_msg)
+
 col_btn_1, col_btn_2, col_btn_3 = st.columns([2, 1, 2])
 with col_btn_2:
-    analyze_clicked = st.button("🚀 Analyze", use_container_width=True)
+    analyze_clicked = st.button("🚀 Analyze", use_container_width=True, disabled=not can_proceed)
 
 if analyze_clicked:
     if resume_file and job_description:
