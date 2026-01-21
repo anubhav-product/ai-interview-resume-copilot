@@ -31,6 +31,9 @@ if not OPENAI_API_KEY:
     st.stop()
 
 try:
+    client = OpenAI(api_key=OPENAI_API_KEY, timeout=60.0)
+except TypeError:
+    # Fallback for version compatibility issues
     client = OpenAI(api_key=OPENAI_API_KEY)
 except Exception as e:
     st.error(f"❌ OpenAI initialization error: {str(e)}")
