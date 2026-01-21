@@ -1,6 +1,6 @@
 import streamlit as st
 from pypdf import PdfReader
-from openai import OpenAI
+import openai
 import os
 from dotenv import load_dotenv
 from datetime import datetime, timedelta
@@ -30,16 +30,8 @@ if not OPENAI_API_KEY:
     st.error("❌ OpenAI API key not found.\n\n**Local:** Create .env in app/ folder\n**Streamlit Cloud:** Add to Secrets")
     st.stop()
 
-# Use st.cache_resource to initialize client only once
-@st.cache_resource
-def get_openai_client():
-    try:
-        return OpenAI(api_key=OPENAI_API_KEY)
-    except Exception as e:
-        st.error(f"❌ OpenAI initialization error: {str(e)}")
-        st.stop()
-
-client = get_openai_client()
+# Set API key for openai library
+openai.api_key = OPENAI_API_KEY
 
 # Rate Limiting Configuration
 MAX_REQUESTS_PER_HOUR = 5  # Free tier limit
@@ -179,7 +171,7 @@ Job Description: {job_description[:1000]}
             ],
             max_tokens=MAX_TOKENS_PER_REQUEST,
             temperature=0.7
-        )
+        )openai
         log_api_usage()
         return response['choices'][0]['message']['content']
     except Exception as e:
