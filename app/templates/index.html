@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Resume & Interview Screening Copilot</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <span class="logo-icon">📄</span>
+                <span class="logo-text">AI Resume Copilot</span>
+            </div>
+            <div class="nav-info">
+                <span class="nav-subtitle">Powered by OpenAI</span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <h1 class="hero-title">
+                <span class="title-gradient">AI Resume & Interview Screening Copilot</span>
+            </h1>
+            <p class="hero-subtitle">Get instant AI-powered insights on resume-job fit with advanced screening analysis</p>
+            <div class="hero-features">
+                <div class="feature-badge">⚡ Real-time Analysis</div>
+                <div class="feature-badge">🎯 Skill Matching</div>
+                <div class="feature-badge">💡 Interview Prep</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <main class="container">
+        <div class="content-wrapper">
+            <!-- Upload Section -->
+            <section class="upload-section">
+                <div class="section-grid">
+                    <!-- Resume Upload Card -->
+                    <div class="upload-card resume-card">
+                        <div class="card-header">
+                            <span class="card-icon">📋</span>
+                            <h2>Resume</h2>
+                        </div>
+                        <div class="card-content">
+                            <div class="upload-area" id="resumeDropZone">
+                                <div class="upload-icon">📄</div>
+                                <p class="upload-text">Drag & drop your PDF here</p>
+                                <p class="upload-subtext">or</p>
+                                <label class="upload-btn">
+                                    <input type="file" id="resumeInput" accept=".pdf" hidden>
+                                    <span>Click to Browse</span>
+                                </label>
+                            </div>
+                            <div class="file-info" id="resumeInfo" style="display: none;">
+                                <div class="file-status">✅ File loaded</div>
+                                <div class="file-name" id="resumeFileName"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Job Description Card -->
+                    <div class="upload-card job-card">
+                        <div class="card-header">
+                            <span class="card-icon">💼</span>
+                            <h2>Job Description</h2>
+                        </div>
+                        <div class="card-content">
+                            <textarea 
+                                id="jobDescription" 
+                                class="job-textarea"
+                                placeholder="Paste the job description here...&#10;Include: responsibilities, requirements, skills needed"
+                                rows="12"></textarea>
+                            <div class="textarea-info">
+                                <span class="word-count">Word count: <span id="wordCount">0</span></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Model Selection & Controls -->
+            <section class="control-section">
+                <div class="control-row">
+                    <div class="model-selector">
+                        <label for="modelSelect">🤖 Select AI Model:</label>
+                        <select id="modelSelect" class="model-dropdown">
+                            <option value="gpt-3.5-turbo">GPT-3.5 Turbo (Fast & Free)</option>
+                            <option value="gpt-4">GPT-4 (Advanced)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="usage-info">
+                        <div class="usage-badge">
+                            <span class="usage-dot"></span>
+                            <span id="usageText">Ready to analyze</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Action Buttons -->
+            <section class="action-section">
+                <button id="analyzeBtn" class="btn btn-primary btn-lg">
+                    <span class="btn-icon">🚀</span>
+                    <span class="btn-text">Analyze Resume</span>
+                    <span class="btn-loader hidden"></span>
+                </button>
+                <button id="resetBtn" class="btn btn-secondary">
+                    <span>↺ Reset</span>
+                </button>
+            </section>
+
+            <!-- Results Section -->
+            <section class="results-section" id="resultsSection" style="display: none;">
+                <div class="results-header">
+                    <h2>📊 Analysis Results</h2>
+                    <div class="results-meta">
+                        <span class="meta-item">Model: <strong id="resultModel"></strong></span>
+                        <span class="meta-item">Time: <strong id="resultTime"></strong></span>
+                    </div>
+                </div>
+
+                <!-- Tabs -->
+                <div class="tabs-container">
+                    <div class="tabs-header">
+                        <button class="tab-btn active" data-tab="report">📖 Full Report</button>
+                        <button class="tab-btn" data-tab="summary">📋 Summary</button>
+                        <button class="tab-btn" data-tab="export">💾 Export</button>
+                    </div>
+
+                    <!-- Full Report Tab -->
+                    <div class="tab-content active" id="report-tab">
+                        <div class="report-content" id="analysisContent"></div>
+                    </div>
+
+                    <!-- Summary Tab -->
+                    <div class="tab-content" id="summary-tab">
+                        <div class="summary-box">
+                            <div class="summary-item">
+                                <span class="summary-icon">✅</span>
+                                <span class="summary-text">Analysis complete</span>
+                            </div>
+                            <div class="summary-item">
+                                <span class="summary-icon">🤖</span>
+                                <span class="summary-text">Model: <strong id="summaryModel"></strong></span>
+                            </div>
+                            <div class="summary-item">
+                                <span class="summary-icon">📊</span>
+                                <span class="summary-text">Full insights ready for download</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Export Tab -->
+                    <div class="tab-content" id="export-tab">
+                        <div class="export-buttons">
+                            <button class="export-btn txt-btn" id="downloadTxt">
+                                <span class="export-icon">📥</span>
+                                <span>Download TXT</span>
+                            </button>
+                            <button class="export-btn md-btn" id="downloadMd">
+                                <span class="export-icon">📄</span>
+                                <span>Download MD</span>
+                            </button>
+                        </div>
+                        <div class="export-info">
+                            <p>💡 Tip: Use markdown for documentation, TXT for quick review</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Disclaimer -->
+                <div class="disclaimer-box">
+                    <div class="disclaimer-icon">⚠️</div>
+                    <div class="disclaimer-content">
+                        <h3>Important Disclaimer</h3>
+                        <ul>
+                            <li>This is a decision-support tool only</li>
+                            <li>Always combine with human judgment</li>
+                            <li>Verify findings through interviews</li>
+                            <li>Never use as the sole hiring criterion</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Error Section -->
+            <section class="error-section" id="errorSection" style="display: none;">
+                <div class="error-box">
+                    <div class="error-icon">❌</div>
+                    <div class="error-content">
+                        <h3>Analysis Failed</h3>
+                        <p id="errorMessage"></p>
+                    </div>
+                    <button class="error-close" onclick="document.getElementById('errorSection').style.display = 'none';">✕</button>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <p>Made with ❤️ for better hiring decisions</p>
+            <p class="footer-note">This tool uses OpenAI API. Your data is processed securely.</p>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>
