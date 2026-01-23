@@ -51,24 +51,41 @@ Go back to PythonAnywhere dashboard:
 ### 6️⃣ Edit WSGI File
 
 Click on the WSGI file that was created:
-- Path: `/home/your-username/flask_app.py`
+- Path: `/var/www/your-username_pythonanywhere_com_wsgi.py`
 
-**Replace the entire content with:**
+**Replace the entire content with (virtualenv users):**
 
 ```python
 import sys
 import os
 
-# Add your project directory to the path
-path = '/home/your-username/ai-interview-resume-copilot/app'
-if path not in sys.path:
-    sys.path.append(path)
+project_home = '/home/your-username/ai-interview-resume-copilot/app'
+if project_home not in sys.path:
+  sys.path.insert(0, project_home)
 
-# Import Flask app
+# Activate your virtualenv
+activate_this = '/home/your-username/.virtualenvs/your-venv-name/bin/activate_this.py'
+with open(activate_this) as file_:
+  exec(file_.read(), dict(__file__=activate_this))
+
+os.environ['FLASK_ENV'] = 'production'
+
 from main import app as application
+```
 
-# Make sure Flask runs in production mode
-application.config['ENV'] = 'production'
+**If you are NOT using a virtualenv, remove the activate_this block:**
+
+```python
+import sys
+import os
+
+project_home = '/home/your-username/ai-interview-resume-copilot/app'
+if project_home not in sys.path:
+  sys.path.insert(0, project_home)
+
+os.environ['FLASK_ENV'] = 'production'
+
+from main import app as application
 ```
 
 ### 7️⃣ Set Environment Variables
@@ -165,6 +182,9 @@ Your app is now live at: **https://your-username.pythonanywhere.com**
 ```bash
 # Check installed packages
 pip list --user
+
+# Check OpenAI + httpx versions
+python -c "import openai, httpx; print(openai.__version__, httpx.__version__)"
 
 # View error log (in bash console)
 cat /var/log/your-username.pythonanywhere.com.error.log

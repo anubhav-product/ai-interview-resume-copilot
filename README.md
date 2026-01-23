@@ -2,7 +2,6 @@
 AI-powered interview and resume screening copilot – PRD, architecture, metrics, and product decisions
 
 ## 🚀 Quick Links
-- **Live Demo:** Deploy FREE on [Streamlit Cloud](https://share.streamlit.io)
 - **[Deployment Guide](./DEPLOYMENT.md)** - 5-minute setup
 
 ## Running the App Locally
@@ -21,17 +20,16 @@ Then run:
 ```bash
 cd app
 pip install -r requirements.txt
-streamlit run app.py
+python main.py
 ```
 
-Visit `http://localhost:8501`
+Visit `http://localhost:5000`
 
 ## 🎯 Features
 - ✅ Upload resume (PDF) & paste job description
 - ✅ AI-powered analysis using GPT-4/GPT-3.5
 - ✅ Rate limiting (5/hour, 20/day) to control costs
 - ✅ Export results as PDF, TXT, or Markdown
-- ✅ Free deployment on Streamlit Cloud
 
 ## 🛡️ Cost Controls
 - **Rate Limiting**: Prevents API abuse

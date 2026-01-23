@@ -187,3 +187,12 @@ AI is used as a decision-support system rather than a replacement for human judg
 - Will recruiters trust AI-generated evaluations?
 - How much feedback do candidates actually want?
 - What level of explainability is required for adoption?
+
+---
+
+## 14. Implementation Notes
+
+- Current MVP is a Flask web app served via WSGI.
+- Deployment target: PythonAnywhere (see deployment docs).
+- Secrets are provided via environment variables (e.g., `OPENAI_API_KEY`).
+- Rate limiting and token caps are enforced to control costs.
