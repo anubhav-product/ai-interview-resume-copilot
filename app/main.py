@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request, jsonify, send_file
 from pypdf import PdfReader
-import openai
+from openai import OpenAI
 import os
 from dotenv import load_dotenv
 from datetime import datetime, timedelta
@@ -18,7 +18,8 @@ OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 if not OPENAI_API_KEY or not OPENAI_API_KEY.startswith("sk-"):
     raise ValueError("❌ Invalid or missing OPENAI_API_KEY in .env file")
 
-openai.api_key = OPENAI_API_KEY
+# Initialize OpenAI client
+client = OpenAI(api_key=OPENAI_API_KEY)
 
 # Flask Setup
 app = Flask(__name__)
@@ -109,7 +110,7 @@ Job Description: {job_description[:1000]}
 """
     
     try:
-        response = openai.ChatCompletion.create(
+        response = client.chat.completions.create(
             model=model,
             messages=[
                 {"role": "system", "content": "You are a helpful career assistant. Provide structured analysis in markdown format."},
@@ -118,7 +119,7 @@ Job Description: {job_description[:1000]}
             max_tokens=MAX_TOKENS_PER_REQUEST,
             temperature=0.7
         )
-        return response['choices'][0]['message']['content']
+        return response.choices[0].message.content
     except Exception as e:
         error_str = str(e).lower()
         
