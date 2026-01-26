@@ -11,11 +11,8 @@
     <nav class="navbar">
         <div class="nav-container">
             <div class="nav-logo">
-                <span class="logo-icon">📄</span>
-                <span class="logo-text">AI Resume Copilot</span>
-            </div>
-            <div class="nav-info">
-                <span class="nav-subtitle">Powered by OpenAI</span>
+                <span class="logo-icon">✨</span>
+                <span class="logo-text">Resume<span style="color: #14b8a6;">Copilot</span></span>
             </div>
         </div>
     </nav>
@@ -24,9 +21,10 @@
     <section class="hero">
         <div class="hero-content">
             <h1 class="hero-title">
-                <span class="title-gradient">AI Resume & Interview Screening Copilot</span>
+                <span style="color: #f1f5f9;">AI-Powered </span><span class="title-gradient">Resume Screening</span><br>
+                <span style="color: #64748b; font-size: 0.7em;">Made Effortless</span>
             </h1>
-            <p class="hero-subtitle">Get instant AI-powered insights on resume-job fit with advanced screening analysis</p>
+            <p class="hero-subtitle">Get instant insights on resume-job fit with advanced AI analysis. Screen smarter, hire faster.</p>
             <div class="hero-features">
                 <div class="feature-badge">⚡ Real-time Analysis</div>
                 <div class="feature-badge">🎯 Skill Matching</div>
@@ -38,141 +36,146 @@
     <!-- Main Content -->
     <main class="container">
         <div class="content-wrapper">
-            <!-- Upload Section -->
-            <section class="upload-section">
-                <div class="section-grid">
-                    <!-- Resume Upload Card -->
-                    <div class="upload-card resume-card">
-                        <div class="card-header">
-                            <span class="card-icon">📋</span>
-                            <h2>Resume</h2>
-                        </div>
-                        <div class="card-content">
-                            <div class="upload-area" id="resumeDropZone">
-                                <div class="upload-icon">📄</div>
-                                <p class="upload-text">Drag & drop your PDF here</p>
-                                <p class="upload-subtext">or</p>
-                                <label class="upload-btn">
-                                    <input type="file" id="resumeInput" accept=".pdf" hidden>
-                                    <span>Click to Browse</span>
-                                </label>
-                            </div>
-                            <div class="file-info" id="resumeInfo" style="display: none;">
-                                <div class="file-status">✅ File loaded</div>
-                                <div class="file-name" id="resumeFileName"></div>
-                            </div>
-                        </div>
-                    </div>
+            <!-- Step Progress Indicator -->
+            <div class="step-progress" id="stepProgress">
+                <div class="step-item active" data-step="1">
+                    <div class="step-circle">1</div>
+                    <div class="step-label">Upload Resume</div>
+                </div>
+                <div class="step-line"></div>
+                <div class="step-item" data-step="2">
+                    <div class="step-circle">2</div>
+                    <div class="step-label">Upload JD</div>
+                </div>
+                <div class="step-line"></div>
+                <div class="step-item" data-step="3">
+                    <div class="step-circle">3</div>
+                    <div class="step-label">View Results</div>
+                </div>
+                <div class="step-line"></div>
+                <div class="step-item" data-step="4">
+                    <div class="step-circle">4</div>
+                    <div class="step-label">Thank You</div>
+                </div>
+            </div>
 
-                    <!-- Job Description Card -->
-                    <div class="upload-card job-card">
-                        <div class="card-header">
-                            <span class="card-icon">💼</span>
-                            <h2>Job Description</h2>
-                        </div>
-                        <div class="card-content">
-                            <textarea 
-                                id="jobDescription" 
-                                class="job-textarea"
-                                placeholder="Paste the job description here...&#10;Include: responsibilities, requirements, skills needed"
-                                rows="12"></textarea>
-                            <div class="textarea-info">
-                                <span class="word-count">Word count: <span id="wordCount">0</span></span>
-                            </div>
-                        </div>
+            <!-- Step 1: Resume Upload -->
+            <section class="step-section" id="step1" style="display: block;">
+                <div class="step-card">
+                    <div class="step-header">
+                        <h2>📄 Step 1: Upload Your Resume</h2>
+                        <p>Upload your resume in PDF format to get started</p>
+                    </div>
+                    <div class="upload-area" id="resumeDropZone">
+                        <div class="upload-icon">📄</div>
+                        <p class="upload-text">Drag & drop your PDF here</p>
+                        <p class="upload-subtext">or</p>
+                        <label class="upload-btn">
+                            <input type="file" id="resumeInput" accept=".pdf" hidden>
+                            <span>Click to Browse</span>
+                        </label>
+                    </div>
+                    <div class="file-info" id="resumeInfo" style="display: none;">
+                        <div class="file-status">✅ Resume loaded successfully!</div>
+                        <div class="file-name" id="resumeFileName"></div>
+                    </div>
+                    <div class="step-actions">
+                        <button id="nextToJD" class="btn btn-primary btn-lg" style="display: none;">
+                            <span>Next: Upload Job Description →</span>
+                        </button>
                     </div>
                 </div>
             </section>
 
-            <!-- Model Selection & Controls -->
-            <section class="control-section">
-                <div class="control-row">
-                    <div class="model-selector">
-                        <label for="modelSelect">🤖 Select AI Model:</label>
-                        <select id="modelSelect" class="model-dropdown">
-                            <option value="gpt-3.5-turbo">GPT-3.5 Turbo (Fast & Free)</option>
-                            <option value="gpt-4">GPT-4 (Advanced)</option>
-                        </select>
+            <!-- Step 2: Job Description Upload -->
+            <section class="step-section" id="step2" style="display: none;">
+                <div class="step-card">
+                    <div class="step-header">
+                        <h2>💼 Step 2: Paste Job Description</h2>
+                        <p>Enter the job description you want to match against</p>
                     </div>
-                    
-                    <div class="usage-info">
-                        <div class="usage-badge">
-                            <span class="usage-dot"></span>
-                            <span id="usageText">Ready to analyze</span>
+                    <textarea 
+                        id="jobDescription" 
+                        class="job-textarea"
+                        placeholder="Paste the job description here...&#10;&#10;Include:&#10;• Job title&#10;• Responsibilities&#10;• Required skills&#10;• Qualifications&#10;• Experience needed"
+                        rows="15"></textarea>
+                    <div class="textarea-info">
+                        <span class="word-count">Word count: <span id="wordCount">0</span></span>
+                    </div>
+                    <div class="step-actions">
+                        <button id="backToResume" class="btn btn-secondary">
+                            <span>← Back</span>
+                        </button>
+                        <div class="model-selector-inline">
+                            <label for="modelSelect">🤖 AI Model:</label>
+                            <select id="modelSelect" class="model-dropdown">
+                                <option value="gpt-3.5-turbo">GPT-3.5 Turbo (Fast)</option>
+                                <option value="gpt-4">GPT-4 (Advanced)</option>
+                            </select>
                         </div>
+                        <button id="analyzeBtn" class="btn btn-primary btn-lg">
+                            <span class="btn-icon">🚀</span>
+                            <span class="btn-text">Analyze Resume</span>
+                            <span class="btn-loader hidden"></span>
+                        </button>
                     </div>
                 </div>
             </section>
 
-            <!-- Action Buttons -->
-            <section class="action-section">
-                <button id="analyzeBtn" class="btn btn-primary btn-lg">
-                    <span class="btn-icon">🚀</span>
-                    <span class="btn-text">Analyze Resume</span>
-                    <span class="btn-loader hidden"></span>
-                </button>
-                <button id="resetBtn" class="btn btn-secondary">
-                    <span>↺ Reset</span>
-                </button>
-            </section>
-
-            <!-- Results Section -->
-            <section class="results-section" id="resultsSection" style="display: none;">
-                <div class="results-header">
-                    <h2>📊 Analysis Results</h2>
-                    <div class="results-meta">
-                        <span class="meta-item">Model: <strong id="resultModel"></strong></span>
-                        <span class="meta-item">Time: <strong id="resultTime"></strong></span>
-                    </div>
-                </div>
-
-                <!-- Tabs -->
-                <div class="tabs-container">
-                    <div class="tabs-header">
-                        <button class="tab-btn active" data-tab="report">📖 Full Report</button>
-                        <button class="tab-btn" data-tab="summary">📋 Summary</button>
-                        <button class="tab-btn" data-tab="export">💾 Export</button>
-                    </div>
-
-                    <!-- Full Report Tab -->
-                    <div class="tab-content active" id="report-tab">
-                        <div class="report-content" id="analysisContent"></div>
-                    </div>
-
-                    <!-- Summary Tab -->
-                    <div class="tab-content" id="summary-tab">
-                        <div class="summary-box">
-                            <div class="summary-item">
-                                <span class="summary-icon">✅</span>
-                                <span class="summary-text">Analysis complete</span>
-                            </div>
-                            <div class="summary-item">
-                                <span class="summary-icon">🤖</span>
-                                <span class="summary-text">Model: <strong id="summaryModel"></strong></span>
-                            </div>
-                            <div class="summary-item">
-                                <span class="summary-icon">📊</span>
-                                <span class="summary-text">Full insights ready for download</span>
-                            </div>
+            <!-- Step 3: Results Section -->
+            <section class="results-section step-section" id="step3" style="display: none;">
+                <div class="glass-card">
+                    <div class="results-header">
+                        <h2>📊 Analysis Results</h2>
+                        <div class="results-meta">
+                            <span>Model: <span id="resultModel"></span></span>
+                            <span>Time: <span id="resultTime"></span></span>
                         </div>
                     </div>
 
-                    <!-- Export Tab -->
-                    <div class="tab-content" id="export-tab">
-                        <div class="export-buttons">
-                            <button class="export-btn txt-btn" id="downloadTxt">
-                                <span class="export-icon">📥</span>
+                    <!-- Analysis Content -->
+                    <div class="analysis-display" id="analysisContent"></div>
+
+                    <!-- Export Buttons -->
+                    <div class="export-section">
+                        <p class="export-hint">💡 Export your analysis</p>
+                        <div class="export-button-group">
+                            <button class="export-button" id="downloadPdf">
+                                <svg class="export-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                    <polyline points="7 10 12 15 17 10"></polyline>
+                                    <line x1="12" y1="15" x2="12" y2="3"></line>
+                                </svg>
+                                <span>Download PDF</span>
+                            </button>
+                            <button class="export-button" id="downloadTxt">
+                                <svg class="export-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                    <polyline points="7 10 12 15 17 10"></polyline>
+                                    <line x1="12" y1="15" x2="12" y2="3"></line>
+                                </svg>
                                 <span>Download TXT</span>
                             </button>
-                            <button class="export-btn md-btn" id="downloadMd">
-                                <span class="export-icon">📄</span>
+                            <button class="export-button" id="downloadMd">
+                                <svg class="export-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                    <polyline points="7 10 12 15 17 10"></polyline>
+                                    <line x1="12" y1="15" x2="12" y2="3"></line>
+                                </svg>
                                 <span>Download MD</span>
                             </button>
                         </div>
-                        <div class="export-info">
-                            <p>💡 Tip: Use markdown for documentation, TXT for quick review</p>
-                        </div>
                     </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="results-actions">
+                    <button id="resetBtn" class="btn btn-secondary">
+                        <span>🔄 Start New Analysis</span>
+                    </button>
+                    <button id="nextToThankYou" class="btn btn-primary">
+                        <span>Continue →</span>
+                    </button>
                 </div>
 
                 <!-- Disclaimer -->
@@ -182,8 +185,8 @@
                         <h3>Important Disclaimer</h3>
                         <ul>
                             <li>This is a decision-support tool only</li>
-                            <li>Always combine with human judgment</li>
-                            <li>Verify findings through interviews</li>
+                            <li>Always combine AI insights with human judgment</li>
+                            <li>Verify findings through interviews and reference checks</li>
                             <li>Never use as the sole hiring criterion</li>
                         </ul>
                     </div>
@@ -199,6 +202,50 @@
                         <p id="errorMessage"></p>
                     </div>
                     <button class="error-close" onclick="document.getElementById('errorSection').style.display = 'none';">✕</button>
+                </div>
+            </section>
+
+            <!-- Step 4: Thank You Section -->
+            <section class="thankyou-section step-section" id="step4" style="display: none;">
+                <div class="thankyou-card">
+                    <div class="thankyou-icon">🎉</div>
+                    <h2>Thank You!</h2>
+                    <p class="thankyou-message">Your resume analysis is complete!</p>
+                    <div class="thankyou-details">
+                        <div class="thankyou-item">
+                            <span class="check-icon">✅</span>
+                            <span>Analysis completed successfully</span>
+                        </div>
+                        <div class="thankyou-item">
+                            <span class="check-icon">✅</span>
+                            <span>PDF report generated</span>
+                        </div>
+                        <div class="thankyou-item">
+                            <span class="check-icon">✅</span>
+                            <span>Ready for your next application</span>
+                        </div>
+                    </div>
+                    <p class="thankyou-note">
+                        We hope this analysis helps you land your dream job!<br>
+                        Best of luck with your application! 🚀
+                    </p>
+                    <div class="thankyou-actions">
+                        <button id="startOver" class="btn btn-primary btn-lg">
+                            <span>🔄 Analyze Another Resume</span>
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Old Thank You Section (Legacy) -->
+            <section class="thankyou-section" id="thankYouSection" style="display: none;">
+                <div class="thankyou-box">
+                    <div class="thankyou-icon">🎉</div>
+                    <div class="thankyou-content">
+                        <h2>Thank You!</h2>
+                        <p>Your analysis is complete and your PDF has been downloaded.</p>
+                        <p class="thankyou-note">We appreciate your trust in AI Resume Copilot.<br>Best of luck with your application!</p>
+                    </div>
                 </div>
             </section>
         </div>

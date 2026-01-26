@@ -1,4 +1,4 @@
-# AI Interview & Resume Screening Copilot
+the ui was very boring i wi# AI Interview & Resume Screening Copilot
 
 ## 1. Product Overview
 

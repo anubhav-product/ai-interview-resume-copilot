@@ -84,39 +84,150 @@ def extract_text_from_pdf(pdf_file):
 def analyze_resume(resume_text, job_description, model="gpt-3.5-turbo"):
     """Analyze resume using OpenAI API"""
     prompt = f"""
-You are an AI career assistant. Analyze the resume against job description in markdown format:
+You are an expert ATS (Applicant Tracking System) consultant and career coach. Provide a comprehensive, professional resume analysis.
 
-### Job Readiness Indicator
-- Strong/Developing/Early with 1-2 line explanation
+**IMPORTANT**: Your analysis should be detailed, actionable, and extensive.
 
-### Matching Skills
-- List matching skills (bullet points)
+# COMPREHENSIVE RESUME ANALYSIS
 
-### Strengths
-- Key strengths (3-5 bullets)
+## 1. EXECUTIVE SUMMARY
+Provide an overall assessment of the resume's strengths and alignment with the job description.
 
-### Skill Gaps
-- Skill / Why it matters / How to improve (bullet format)
+## 2. ATS COMPATIBILITY ANALYSIS
+### Overall ATS Score: X/100
+- **Keyword Match Score**: X/100 - Analysis of keyword density and relevance
+- **Format Compatibility**: Assessment of ATS-friendly formatting
+- **Critical Issues**: List any formatting problems that will cause ATS rejection
+- **Immediate Fixes**: Top 3 urgent changes needed
 
-### Suggested Job Roles
-- Role / Why fits / Skills to strengthen (bullet format)
+## 3. DETAILED SKILLS ANALYSIS
 
-### Interview Focus Areas
-- Topics to probe (bullet format)
+### Required Skills Checklist
+For each skill in the job description:
+- ✓ Skill Name - (Present/Missing)
+- Evidence in resume (if present)
+- Recommendation for improvement
 
-Resume: {resume_text[:2000]}
+### Missing Critical Skills (HIGH PRIORITY)
+List skills from JD not found in resume and explain their importance
 
-Job Description: {job_description[:1000]}
-"""
+### Transferable Skills to Highlight
+Identify skills from resume that apply to this role
+
+## 4. EXPERIENCE ALIGNMENT
+
+### Relevant Experience Breakdown
+- Match percentage: X%
+- Strongest alignments
+- Experience gaps
+- Suggestions to reframe existing experience
+
+### Achievement Quantification
+- Current quantified achievements found
+- Recommendations for adding metrics
+- Example bullet point improvements
+
+## 5. KEYWORD OPTIMIZATION STRATEGY
+
+### Current Keywords Present (Matching JD)
+List all matching keywords
+
+### CRITICAL Missing Keywords
+- Keyword | Importance | Where to Add | How to Incorporate Naturally
+
+### Keyword Density Recommendations
+- Optimal placement strategy
+- Sections needing keyword enrichment
+
+## 6. ATS-FRIENDLY FORMATTING CHECKLIST
+- ✓/✗ Standard section headers
+- ✓/✗ Simple, clean font
+- ✓/✗ No tables/text boxes/graphics
+- ✓/✗ Consistent formatting
+- ✓/✗ Proper file format (PDF/Word)
+- ✓/✗ Appropriate length (1-2 pages)
+
+### Formatting Improvements Needed
+List specific changes
+
+## 7. CONTENT ENHANCEMENT RECOMMENDATIONS
+
+### Professional Summary Rewrite
+Provide an improved summary tailored to the job (3-4 sentences with keywords)
+
+### Work Experience Optimization
+For top 2-3 positions:
+- Current bullet analysis
+- Improved version with action verbs and metrics
+- Missing impact statements
+
+### Skills Section Enhancement
+- Technical skills to add
+- Soft skills to emphasize
+- Certifications needed
+
+## 8. IMMEDIATE ACTION PLAN
+
+### This Week (CRITICAL):
+1. [Specific actionable task]
+2. [Specific actionable task]
+3. [Specific actionable task]
+
+### Next Week (IMPORTANT):
+1. [Specific actionable task]
+2. [Specific actionable task]
+
+### Month 1 (ENHANCEMENT):
+1. [Specific actionable task]
+2. [Specific actionable task]
+
+## 9. COMPETITIVE POSITIONING
+- Your unique value proposition for this role
+- How to differentiate from other candidates
+- Key talking points for interviews
+
+## 10. POTENTIAL RED FLAGS & SOLUTIONS
+- Employment gaps (if any) - how to address
+- Career transition challenges - how to frame
+- Overqualification/underqualification concerns
+- Recommended explanations
+
+## 11. INTERVIEW PREPARATION INSIGHTS
+Based on your resume:
+- Expected interview questions (5-7)
+- Key achievements to emphasize
+- Stories to prepare (STAR method)
+
+## 12. MATCH ASSESSMENT
+- Overall Match Score: X/100
+- Match Breakdown:
+  * Skills Match: X%
+  * Experience Match: X%  
+  * Education Match: X%
+  * Cultural Fit Indicators: X%
+
+## 13. FINAL RECOMMENDATIONS
+- Top 3 strengths to emphasize
+- Top 3 areas needing immediate improvement
+- Timeline to optimize resume (realistic)
+- Success probability if applied today: X%
+
+Resume Content:
+{resume_text[:3000]}
+
+Job Description:
+{job_description[:2000]}
+
+Provide detailed, specific, actionable analysis following this framework."""
     
     try:
         response = client.chat.completions.create(
             model=model,
             messages=[
-                {"role": "system", "content": "You are a helpful career assistant. Provide structured analysis in markdown format."},
+                {"role": "system", "content": "You are an expert ATS consultant and career coach providing detailed, actionable resume analysis. Be specific, comprehensive, and professional."},
                 {"role": "user", "content": prompt}
             ],
-            max_tokens=MAX_TOKENS_PER_REQUEST,
+            max_tokens=3000,
             temperature=0.7
         )
         return response.choices[0].message.content
@@ -212,6 +323,19 @@ def api_download():
                 mimetype='text/markdown',
                 as_attachment=True,
                 download_name=f'analysis_{datetime.now().strftime("%Y%m%d_%H%M%S")}.md'
+            )
+        elif format_type == 'pdf':
+            # Professional PDF generation
+            from generate_pdf import generate_professional_pdf
+            summary = data.get('summary', 'Analysis Summary')
+            model = data.get('model', 'gpt-3.5-turbo')
+            timestamp = datetime.now()
+            pdf_buffer = generate_professional_pdf(analysis, summary, model, timestamp)
+            return send_file(
+                pdf_buffer,
+                mimetype='application/pdf',
+                as_attachment=True,
+                download_name=f'analysis_{datetime.now().strftime("%Y%m%d_%H%M%S")}.pdf'
             )
         else:
             return jsonify({'error': 'Invalid format'}), 400
